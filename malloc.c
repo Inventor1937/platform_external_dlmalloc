@@ -109,7 +109,7 @@
        are not screened or privileged), but may be useful as one
        aspect of a secure implementation.
 
-  Thread-safety: NOT thread-safe unless USE_LOCKS defined non-zero
+  Thread-safety: thread-safe unless USE_LOCKS defined to zero
        When USE_LOCKS is defined, each public call to malloc, free,
        etc is surrounded with a lock. By default, this uses a plain
        pthread mutex, win32 critical section, or a spin-lock if if
@@ -259,7 +259,7 @@ MSPACES                  default: 0 (false)
 ONLY_MSPACES             default: 0 (false)
   If true, only compile in mspace versions, not regular versions.
 
-USE_LOCKS                default: 0 (false)
+USE_LOCKS                default: 1 (true)
   Causes each call to each public routine to be surrounded with
   pthread or WIN32 mutex lock/unlock. (If set true, this can be
   overridden on a per-mspace basis for mspace versions.) If set to a
@@ -584,10 +584,9 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 /* The maximum possible size_t value has all bits set */
 #define MAX_SIZE_T           (~(size_t)0)
 
-#ifndef USE_LOCKS /* ensure true if spin or recursive locks set */
-#define USE_LOCKS  ((defined(USE_SPIN_LOCKS) && USE_SPIN_LOCKS != 0) || \
-                    (defined(USE_RECURSIVE_LOCKS) && USE_RECURSIVE_LOCKS != 0))
-#endif /* USE_LOCKS */
+#ifndef USE_LOCKS
+    #define USE_LOCKS  1
+#endif 
 
 #if USE_LOCKS /* Spin locks for gcc >= 4.1, older gcc on x86, MSC >= 1310 */
 #if ((defined(__GNUC__) &&                                              \
